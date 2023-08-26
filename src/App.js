@@ -1,18 +1,18 @@
 import React, { useState } from "react";
-import ReactDOM from "react-dom";
-import { Stage, Layer } from "react-konva";
+import { Layer, Stage } from "react-konva";
 import { v4 as uuidv4 } from "uuid";
-import ImageDisplay from "./components/ImageDisplay";
-import Annotation from "./components/Annotation";
 import "./App.css";
 import Images from "./assets/images";
+import Annotation from "./components/Annotation";
+import ImageDisplay from "./components/ImageDisplay";
+import Toolbar from "./components/Toolbar";
 
 function App() {
   const initialAnnotations = [
     {
       id: uuidv4(),
-      x: 100,
-      y: 100,
+      x: 400,
+      y: 200,
       width: 100,
       height: 100,
     },
@@ -34,6 +34,23 @@ function App() {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [newAnnotation, setNewAnnotation] = useState([]);
   const [unsavedAnnotations, setUnsavedAnnotations] = useState([]);
+
+  const handleRectangle = () => {
+    const tempId = uuidv4();
+    const randomX = Math.floor(Math.random() * 700);
+    const randomY = Math.floor(Math.random() * 400);
+    setUnsavedAnnotations([
+      ...unsavedAnnotations,
+      {
+        id: tempId,
+        x: randomX,
+        y: randomY,
+        width: 100,
+        height: 100,
+      },
+    ]);
+    setSelectedId(tempId);
+  };
 
   const handleMouseEnter = (event) => {
     event.target.getStage().container().style.cursor = "crosshair";
@@ -66,13 +83,6 @@ function App() {
 
   const handleMouseUp = () => {
     if (!selectedId && newAnnotation.length > 0) {
-      // const updatedImageAnnotations = [...imageAnnotations];
-      // updatedImageAnnotations[currentImageIndex].annotations.push(
-      //   ...newAnnotation
-      // );
-
-      // setImageAnnotations(updatedImageAnnotations);
-      // setNewAnnotation([]);
       setUnsavedAnnotations([...unsavedAnnotations, ...newAnnotation]);
       setNewAnnotation([]);
     }
@@ -80,8 +90,9 @@ function App() {
 
   const handleChangeAnnotation = (newShapeProps) => {
     const updatedAnnotations = [...imageAnnotations];
-    const currentImageAnnotations =
-      updatedAnnotations[currentImageIndex].annotations;
+    const currentImageAnnotations = [
+      ...updatedAnnotations[currentImageIndex].annotations,
+    ];
 
     const newAnnotations = currentImageAnnotations.map((annotation) => {
       if (annotation.id === newShapeProps.id) {
@@ -90,31 +101,43 @@ function App() {
       return annotation;
     });
 
+    const newUnsavedAnnotations = unsavedAnnotations.map((annotation) => {
+      if (annotation.id === newShapeProps.id) {
+        return newShapeProps;
+      }
+      return annotation;
+    });
+
     updatedAnnotations[currentImageIndex].annotations = newAnnotations;
     setImageAnnotations(updatedAnnotations);
+    setUnsavedAnnotations(newUnsavedAnnotations);
   };
 
   const handleKeyDown = (event) => {
     if (event.keyCode === 8 || event.keyCode === 46) {
-      if (selectedId !== null) {
-        const updatedAnnotations = [...imageAnnotations];
-        const currentImageAnnotations =
-          updatedAnnotations[currentImageIndex].annotations;
+      handleDelete();
+    }
+  };
 
-        const newAnnotations = currentImageAnnotations.filter(
+  const handleDelete = () => {
+    if (selectedId !== null) {
+      const updatedAnnotations = [...imageAnnotations];
+      const currentImageAnnotations =
+        updatedAnnotations[currentImageIndex].annotations;
+
+      const newAnnotations = currentImageAnnotations.filter(
+        (annotation) => annotation.id !== selectedId
+      );
+      if (newAnnotations.length === currentImageAnnotations.length) {
+        const newUnsavedAnnotations = unsavedAnnotations.filter(
           (annotation) => annotation.id !== selectedId
         );
-        if (newAnnotations.length === currentImageAnnotations.length) {
-          const newUnsavedAnnotations = unsavedAnnotations.filter(
-            (annotation) => annotation.id !== selectedId
-          );
-          setUnsavedAnnotations(newUnsavedAnnotations);
-          return;
-        }
-
-        updatedAnnotations[currentImageIndex].annotations = newAnnotations;
-        setImageAnnotations(updatedAnnotations);
+        setUnsavedAnnotations(newUnsavedAnnotations);
+        return;
       }
+
+      updatedAnnotations[currentImageIndex].annotations = newAnnotations;
+      setImageAnnotations(updatedAnnotations);
     }
   };
 
@@ -123,7 +146,7 @@ function App() {
       prevIndex === imageAnnotations.length - 1 ? 0 : prevIndex + 1
     );
     setUnsavedAnnotations([]);
-    setSelectedId(null); // Reset selected annotation when switching images
+    setSelectedId(null);
   };
 
   const handlePreviousImage = () => {
@@ -131,25 +154,40 @@ function App() {
       prevIndex === 0 ? imageAnnotations.length - 1 : prevIndex - 1
     );
     setUnsavedAnnotations([]);
-    setSelectedId(null); // Reset selected annotation when switching images
+    setSelectedId(null);
   };
 
   const handleSave = () => {
     const updatedImageAnnotations = [...imageAnnotations];
-    updatedImageAnnotations[currentImageIndex].annotations.push(
-      ...unsavedAnnotations
+
+    // Remove annotations with width and height of 0 from both current and unsaved annotations
+    const filteredUnsavedAnnotations = unsavedAnnotations.filter(
+      (annotation) => annotation.width !== 0 && annotation.height !== 0
     );
-    console.log(updatedImageAnnotations);
-    if (updatedImageAnnotations[currentImageIndex].annotations.length === 0) {
+    const filteredCurrentAnnotations = updatedImageAnnotations[
+      currentImageIndex
+    ].annotations.filter(
+      (annotation) => annotation.width !== 0 && annotation.height !== 0
+    );
+
+    // Combine the filtered current and unsaved annotations
+    const combinedAnnotations = [
+      ...filteredCurrentAnnotations,
+      ...filteredUnsavedAnnotations,
+    ];
+
+    // Update the annotations for the current image
+    updatedImageAnnotations[currentImageIndex].annotations =
+      combinedAnnotations;
+
+    if (combinedAnnotations.length === 0) {
       alert("Please draw annotations before saving.");
     } else {
       setImageAnnotations(updatedImageAnnotations);
       setUnsavedAnnotations([]);
       alert(
-        `${updatedImageAnnotations[currentImageIndex].annotations.length} ${
-          updatedImageAnnotations[currentImageIndex].annotations.length !== 1
-            ? "annotations"
-            : "annotation"
+        `${combinedAnnotations.length} ${
+          combinedAnnotations.length !== 1 ? "annotations" : "annotation"
         } saved for ${currentImage.id}`
       );
     }
@@ -186,7 +224,6 @@ function App() {
     anchor.remove();
 
     alert(`Annotations for ${currentImage.id} downloaded!`);
-
   };
 
   const currentImage = imageAnnotations[currentImageIndex];
@@ -206,6 +243,7 @@ function App() {
           <button onClick={handleSubmit}>Submit</button>
         </div>
       </div>
+      <Toolbar onRectangle={handleRectangle} onDelete={handleDelete} />
       <Stage
         width={800}
         height={500}

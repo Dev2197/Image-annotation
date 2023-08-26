@@ -44,7 +44,7 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin: 50px 0;
+  margin: 20px 0;
 }
 
 .header h2 {
@@ -80,3 +80,41 @@
   background: #f4e603;
   box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.2), 0 3px 8px 0 rgba(0, 0, 0, 0.15);
 }
+
+/* Add this to your Toolbar.css or another stylesheet */
+
+.toolbar {
+  display: flex;
+  align-items: center;
+  background-color: white;
+  width: 800px;
+  height: 50px;
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 30px;
+}
+
+.icon {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 30px;
+  height: 30px;
+  background-color: #3498db;
+  border-radius: 50%;
+  margin-right: 10px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.icon:hover {
+  background-color: #2980b9;
+  color: white;
+}
+.icon:active{
+  background-color: #2980b9;
+  color: white;
+}
+
