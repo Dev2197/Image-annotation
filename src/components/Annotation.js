@@ -7,10 +7,18 @@ const Annotation = ({ shapeProps, isSelected, onSelect, onChange }) => {
 
   const handleDragEnd = (e) => {
     const box = e.target;
-    const x = box.x();
-    const y = box.y();
-      onChange({ x, y, width: shapeProps.width, height: shapeProps.height });
-    
+    const x = box.position().x;
+    const y = box.position().y;
+    onChange({ ...shapeProps, x, y });
+  };
+
+  const handleDragMove = () => {
+    const node = shapeRef.current;
+    if (node) {
+      const x = node.x();
+      const y = node.y();
+      onChange({ ...shapeProps, x, y });
+    }
   };
 
   const handleTransformEnd = () => {
@@ -56,8 +64,8 @@ const Annotation = ({ shapeProps, isSelected, onSelect, onChange }) => {
       <Rect
         {...shapeProps}
         fill="transparent"
-        stroke="blue"
-        strokeWidth={2}
+        stroke="#eb4d4b"
+        strokeWidth={3}
         onMouseDown={onSelect}
         draggable
         onDragEnd={handleDragEnd}
