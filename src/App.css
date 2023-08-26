@@ -4,7 +4,6 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  /* background: #f0f0f0; */
   background-image: linear-gradient(to right, #00b4db, #0083b0);
 }
 .canvas-container:focus {
@@ -81,8 +80,6 @@
   box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.2), 0 3px 8px 0 rgba(0, 0, 0, 0.15);
 }
 
-/* Add this to your Toolbar.css or another stylesheet */
-
 .toolbar {
   display: flex;
   align-items: center;
@@ -110,10 +107,6 @@
 }
 
 .icon:hover {
-  background-color: #2980b9;
-  color: white;
-}
-.icon:active{
   background-color: #2980b9;
   color: white;
 }
