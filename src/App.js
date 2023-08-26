@@ -8,6 +8,7 @@ import ImageDisplay from "./components/ImageDisplay";
 import Toolbar from "./components/Toolbar";
 
 function App() {
+  // Initial annotations for the first image
   const initialAnnotations = [
     {
       id: uuidv4(),
@@ -18,6 +19,7 @@ function App() {
     },
   ];
 
+  // State management for image annotations and various interactions
   const [imageAnnotations, setImageAnnotations] = useState([
     {
       id: "IMAGE_1",
@@ -35,6 +37,7 @@ function App() {
   const [newAnnotation, setNewAnnotation] = useState([]);
   const [unsavedAnnotations, setUnsavedAnnotations] = useState([]);
 
+  // Event handler to create a new annotation (rectangle) at a random position
   const handleRectangle = () => {
     const tempId = uuidv4();
     const randomX = Math.floor(Math.random() * 700);
@@ -52,6 +55,7 @@ function App() {
     setSelectedId(tempId);
   };
 
+  // Event handlers for mouse interactions
   const handleMouseEnter = (event) => {
     event.target.getStage().container().style.cursor = "crosshair";
   };
@@ -88,6 +92,7 @@ function App() {
     }
   };
 
+  // Event handler to update an annotation's properties
   const handleChangeAnnotation = (newShapeProps) => {
     const updatedAnnotations = [...imageAnnotations];
     const currentImageAnnotations = [
@@ -120,6 +125,7 @@ function App() {
   };
 
   const handleDelete = () => {
+    // Implementation for deleting annotations
     if (selectedId !== null) {
       const updatedAnnotations = [...imageAnnotations];
       const currentImageAnnotations =
@@ -142,6 +148,7 @@ function App() {
   };
 
   const handleNextImage = () => {
+    // Implementation for switching to the next image
     setCurrentImageIndex((prevIndex) =>
       prevIndex === imageAnnotations.length - 1 ? 0 : prevIndex + 1
     );
@@ -150,6 +157,7 @@ function App() {
   };
 
   const handlePreviousImage = () => {
+    // Implementation for switching to the previous image
     setCurrentImageIndex((prevIndex) =>
       prevIndex === 0 ? imageAnnotations.length - 1 : prevIndex - 1
     );
@@ -157,6 +165,7 @@ function App() {
     setSelectedId(null);
   };
 
+  // Event handler to save annotations
   const handleSave = () => {
     const updatedImageAnnotations = [...imageAnnotations];
 
@@ -193,6 +202,7 @@ function App() {
     }
   };
 
+  // Implementation for submitting annotations
   const handleSubmit = () => {
     const numUnsavedAnnotations = unsavedAnnotations.length;
     if (numUnsavedAnnotations > 0) {
@@ -212,7 +222,7 @@ function App() {
       [currentImage.id]: formattedAnnotations,
     };
 
-    const formattedJson = JSON.stringify(annotationsData, null, 2); // Indent with 2 spaces
+    const formattedJson = JSON.stringify(annotationsData, null, 2);
 
     const dataStr =
       "data:text/json;charset=utf-8," + encodeURIComponent(formattedJson);
